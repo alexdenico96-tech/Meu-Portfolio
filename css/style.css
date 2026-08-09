@@ -20,6 +20,10 @@
   --fonte: 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
 
+html {
+  scroll-behavior: smooth; /* faz a página rolar suavemente ao clicar em links âncora (#sobre, #contato, etc) */
+}
+
 body {
   font-family: var(--fonte);
   color: var(--cor-texto);
@@ -289,14 +293,22 @@ body {
 }
 
 .redes-sociais a {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   color: #fff;
   text-decoration: none;
   opacity: 0.8;
-  transition: opacity 0.2s;
+  transition: opacity 0.2s, transform 0.2s;
 }
 
 .redes-sociais a:hover {
   opacity: 1;
+  transform: translateY(-3px);
+}
+
+.redes-sociais svg {
+  flex-shrink: 0; /* impede o ícone de espremer quando o espaço é pequeno */
 }
 
 /* ============================
@@ -325,5 +337,14 @@ body {
 
   .estatisticas {
     gap: 2rem;
+  }
+
+  .redes-sociais {
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .redes-sociais span {
+    font-size: 0.85rem;
   }
 }
