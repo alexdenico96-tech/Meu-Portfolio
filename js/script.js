@@ -67,3 +67,54 @@ const observer = new IntersectionObserver(
 
 // Manda o observador vigiar cada número da seção de estatísticas
 numeros.forEach((numero) => observer.observe(numero));
+
+
+// ============================
+// FORMULÁRIO DE CONTATO
+// ============================
+
+const formContato = document.getElementById('formContato');
+
+formContato.addEventListener('submit', (evento) => {
+  // evita o comportamento padrão do formulário, que é recarregar a página
+  evento.preventDefault();
+
+  // pega os valores digitados, removendo espaços em branco nas pontas
+  const nome = formContato.nome.value.trim();
+  const email = formContato.email.value.trim();
+  const mensagem = formContato.mensagem.value.trim();
+
+  // expressão regular simples para validar formato de email (algo@algo.algo)
+  const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (nome === '' || email === '' || mensagem === '') {
+    mostrarFeedback('Por favor, preencha todos os campos.', 'erro');
+    return;
+  }
+
+  if (!regexEmail.test(email)) {
+    mostrarFeedback('Digite um email válido.', 'erro');
+    return;
+  }
+
+  // Por enquanto só simulamos o envio (sem back-end ainda).
+  // No futuro aqui entraria uma chamada a um serviço como Formspree ou EmailJS.
+  mostrarFeedback(`Obrigado, ${nome}! Sua mensagem foi recebida (simulação).`, 'sucesso');
+  formContato.reset(); // limpa os campos do formulário
+});
+
+// Cria (ou reutiliza) um elemento de texto abaixo do formulário para mostrar o feedback
+function mostrarFeedback(texto, tipo) {
+  let feedback = document.getElementById('formFeedback');
+
+  if (!feedback) {
+    feedback = document.createElement('p');
+    feedback.id = 'formFeedback';
+    formContato.appendChild(feedback);
+  }
+
+  feedback.textContent = texto;
+  feedback.style.color = tipo === 'erro' ? '#e63946' : '#2a9d8f';
+  feedback.style.marginTop = '0.5rem';
+  feedback.style.fontWeight = '600';
+}
