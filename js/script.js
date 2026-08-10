@@ -22,6 +22,51 @@ links.forEach((link) => {
 
 
 // ============================
+// DARK MODE (COM PERSISTÊNCIA)
+// ============================
+
+const themeToggle = document.getElementById('themeToggle');
+const themeIcon = themeToggle.querySelector('.theme-icon');
+const html = document.documentElement;
+
+// 1) Ao carregar a página, decide qual tema usar:
+//    prioridade: escolha salva pelo usuário > preferência do sistema operacional > claro
+function aplicarTemaInicial() {
+  const temaSalvo = localStorage.getItem('tema');
+
+  if (temaSalvo) {
+    definirTema(temaSalvo);
+    return;
+  }
+
+  const prefereSistemaEscuro = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  definirTema(prefereSistemaEscuro ? 'dark' : 'light');
+}
+
+// 2) Aplica o tema no HTML e atualiza o ícone do botão
+function definirTema(tema) {
+  if (tema === 'dark') {
+    html.setAttribute('data-theme', 'dark');
+    themeIcon.textContent = '☀️'; // mostra sol = "clique para clarear"
+  } else {
+    html.removeAttribute('data-theme');
+    themeIcon.textContent = '🌙'; // mostra lua = "clique para escurecer"
+  }
+}
+
+// 3) Ao clicar, alterna o tema e SALVA a escolha no navegador do visitante
+//    (localStorage persiste mesmo depois de fechar o navegador)
+themeToggle.addEventListener('click', () => {
+  const temaAtual = html.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+  const novoTema = temaAtual === 'dark' ? 'light' : 'dark';
+  definirTema(novoTema);
+  localStorage.setItem('tema', novoTema);
+});
+
+aplicarTemaInicial();
+
+
+// ============================
 // ESTATÍSTICAS ANIMADAS (CONTADOR)
 // ============================
 
@@ -75,16 +120,16 @@ numeros.forEach((numero) => observer.observe(numero));
 
 const formContato = document.getElementById('formContato');
 
-formContato.addEventListener('submit', (evento) => {
-  // evita o comportamento padrão do formulário, que é recarregar a página
+// Endereço do backend. Em desenvolvimento local aponta pro localhost;
+// depois de publicar o backend (Render, Railway, etc), troque pela URL pública.
+const URL_BACKEND = 'http://localhost:3000/api/contato';
+
+formContato.addEventListener('submit', async (evento) => {
   evento.preventDefault();
 
-  // pega os valores digitados, removendo espaços em branco nas pontas
   const nome = formContato.nome.value.trim();
   const email = formContato.email.value.trim();
   const mensagem = formContato.mensagem.value.trim();
-
-  // expressão regular simples para validar formato de email (algo@algo.algo)
   const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   if (nome === '' || email === '' || mensagem === '') {
@@ -97,10 +142,33 @@ formContato.addEventListener('submit', (evento) => {
     return;
   }
 
-  // Por enquanto só simulamos o envio (sem back-end ainda).
-  // No futuro aqui entraria uma chamada a um serviço como Formspree ou EmailJS.
-  mostrarFeedback(`Obrigado, ${nome}! Sua mensagem foi recebida (simulação).`, 'sucesso');
-  formContato.reset(); // limpa os campos do formulário
+  const botaoEnviar = formContato.querySelector('button[type="submit"]');
+  const textoOriginalBotao = botaoEnviar.textContent;
+  botaoEnviar.textContent = 'Enviando...';
+  botaoEnviar.disabled = true;
+
+  try {
+    const resposta = await fetch(URL_BACKEND, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nome, email, mensagem }),
+    });
+
+    const dados = await resposta.json();
+
+    if (!resposta.ok) {
+      throw new Error(dados.erro || 'Erro ao enviar mensagem.');
+    }
+
+    mostrarFeedback(`Obrigado, ${nome}! Sua mensagem foi enviada com sucesso.`, 'sucesso');
+    formContato.reset();
+  } catch (erro) {
+    mostrarFeedback('Não foi possível enviar agora. Tente novamente em instantes.', 'erro');
+    console.error(erro);
+  } finally {
+    botaoEnviar.textContent = textoOriginalBotao;
+    botaoEnviar.disabled = false;
+  }
 });
 
 // Cria (ou reutiliza) um elemento de texto abaixo do formulário para mostrar o feedback

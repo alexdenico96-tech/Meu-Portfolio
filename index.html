@@ -26,6 +26,10 @@
         <span></span>
         <span></span>
       </button>
+
+      <button class="theme-toggle" id="themeToggle" aria-label="Alternar tema claro/escuro">
+        <span class="theme-icon">🌙</span>
+      </button>
     </nav>
   </header>
 
@@ -39,14 +43,20 @@
         <a href="#projetos" class="btn btn-secondary">Ver projetos</a>
       </div>
     </div>
+    <div class="hero-imagem-container">
+      <img src="assets/perfil-hero.png" alt="Ilustração vetorizada minha, programando em um notebook" class="hero-imagem">
+    </div>
   </section>
 
   <!-- ===== SOBRE ===== -->
   <section class="sobre" id="sobre">
     <h2 class="section-title">Sobre mim</h2>
     <p class="section-text">
-      Texto de recheio (lorem ipsum) aqui — depois você substitui por sua história real,
-      formação e o que te motiva a programar.
+      Atualmente estudando na TOTI Brasil, onde venho me aprofundando em desenvolvimento
+      full-stack. Gosto de transformar problemas do dia a dia em ferramentas práticas —
+      da lógica de back-end até os detalhes de interface que fazem o produto ser fácil de usar.
+      Estou construindo meu portfólio aos poucos, documentando cada projeto como parte
+      do meu processo de aprendizado.
     </p>
   </section>
 
@@ -55,16 +65,32 @@
     <h2 class="section-title">Projetos</h2>
     <div class="projetos-grid">
       <article class="card-projeto">
-        <h3>Projeto 1</h3>
-        <p>Descrição curta de recheio sobre o projeto.</p>
+        <h3>Ferramenta Financeira</h3>
+        <p>
+          Aplicação full-stack para gerenciar finanças pessoais ou empresariais: importe extratos
+          via CSV ou lance transações manualmente, organize por categorias personalizáveis,
+          acompanhe gastos em gráficos interativos, receba insights automáticos e exporte extratos
+          em PDF. Contas empresariais podem gerenciar múltiplas empresas com visão individual ou
+          consolidada — pensado para uso pessoal, times financeiros ou contadores que atendem
+          vários clientes.
+        </p>
+        <a href="https://dashboard-de-finan-as.vercel.app" target="_blank" rel="noopener noreferrer" class="link-projeto">
+          Ver aplicação &rarr;
+        </a>
       </article>
       <article class="card-projeto">
-        <h3>Projeto 2</h3>
-        <p>Descrição curta de recheio sobre o projeto.</p>
+        <h3>Portfólio Pessoal</h3>
+        <p>
+          Este site que você está navegando agora — construído do zero com HTML, CSS e
+          JavaScript puro, sem frameworks, como projeto de estudo de front-end.
+        </p>
+        <a href="https://github.com/SEU_USUARIO/portfolio" target="_blank" rel="noopener noreferrer" class="link-projeto">
+          Ver código &rarr;
+        </a>
       </article>
-      <article class="card-projeto">
-        <h3>Projeto 3</h3>
-        <p>Descrição curta de recheio sobre o projeto.</p>
+      <article class="card-projeto card-projeto-em-breve">
+        <h3>Em breve</h3>
+        <p>Novos projetos a caminho — volte em breve para conferir.</p>
       </article>
     </div>
   </section>
