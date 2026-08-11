@@ -1,53 +1,76 @@
-# Backend do Portfólio
+# Meu Portfólio
 
-Servidor pequeno em Node.js + Express responsável por receber os dados do
-formulário de contato e enviar um email real usando Nodemailer.
+Portfólio pessoal construído do zero com HTML, CSS e JavaScript puro no front-end
+(sem frameworks) e um pequeno backend em Node.js para envio de email — projeto de
+aprendizado de desenvolvimento full-stack, construído passo a passo.
 
-## Como rodar localmente
+🔗 **Site publicado:** https://SEU_USUARIO.github.io/portfolio/
+🔗 **Backend (API de contato):** https://meu-portfolio-6dcj.onrender.com
 
-1. Entre na pasta e instale as dependências:
-   ```bash
-   cd backend
-   npm install
-   ```
+## 🚧 Status
+Concluído e publicado — front-end no GitHub Pages, backend no Render.
 
-2. Copie o arquivo de exemplo de variáveis de ambiente:
-   ```bash
-   cp .env.example .env
-   ```
+## 🛠️ Tecnologias
 
-3. Gere uma **senha de app** do Gmail (não é sua senha normal):
-   - Acesse https://myaccount.google.com/security
-   - Ative a "Verificação em duas etapas" (obrigatório para gerar senha de app)
-   - Vá em "Senhas de app", crie uma nova para "Email"
-   - Copie a senha gerada (16 caracteres) e cole no `.env`, no campo `EMAIL_PASS`
+**Front-end**
+- HTML5 (tags semânticas)
+- CSS3 (Flexbox, Grid, Media Queries, variáveis CSS, dark mode)
+- JavaScript Vanilla (DOM, Intersection Observer, Fetch API, localStorage)
 
-4. Preencha o `.env`:
-   ```
-   EMAIL_USER=alexdenico@gmail.com
-   EMAIL_PASS=xxxxxxxxxxxxxxxx
-   PORT=3000
-   ```
+**Back-end**
+- Node.js + Express
+- Nodemailer (envio de email via SMTP do Gmail)
+- Deploy no Render
 
-5. Rode o servidor:
-   ```bash
-   npm start
-   ```
-   Acesse `http://localhost:3000` — deve aparecer "Backend do portfólio está rodando."
+## ✨ Funcionalidades
+- Layout responsivo (desktop, tablet e mobile)
+- Menu de navegação com botão hambúrguer no mobile
+- Rolagem suave entre seções
+- Modo claro/escuro com persistência da escolha do visitante (localStorage)
+- Seção de estatísticas com contador animado ao entrar na tela
+- Formulário de contato com validação (front e back-end) e envio real de email
+- Foto vetorizada no hero, mantendo a identidade visual do site
 
-## Como publicar (deploy)
+## 📋 map
+- [x] Estrutura inicial do projeto
+- [x] Estrutura HTML das seções
+- [x] Estilização e responsividade
+- [x] Menu responsivo
+- [x] Estatísticas animadas
+- [x] Formulário de contato
+- [x] Ícones de redes sociais
+- [x] Deploy no GitHub Pages
+- [x] Conteúdo real (formação e projetos)
+- [x] Foto vetorizada no hero
+- [x] Dark mode com persistência
+- [x] Backend próprio com envio real de email
+- [x] Deploy do backend no Render
+- [ ] Adicionar novos projetos conforme forem ficando prontos
 
-O GitHub Pages não roda back-end, então esse servidor precisa ser hospedado
-separadamente. Opções gratuitas recomendadas:
+## 📁 Estrutura do projeto
+```
+portfolio/
+├── index.html
+├── css/
+│   └── style.css
+├── js/
+│   └── script.js
+├── assets/
+│   └── perfil-hero.png
+├── backend/
+│   ├── server.js
+│   ├── package.json
+│   ├── .env.example
+│   ├── .gitignore
+│   └── README.md          (setup e deploy do backend)
+└── README.md               (este arquivo)
+```
 
-- **Render** (render.com) — mais simples para iniciantes, plano free disponível
-- **Railway** (railway.app)
+## 📬 Como o formulário de contato funciona
+1. O visitante preenche o formulário no site (validação instantânea em JavaScript).
+2. Os dados são enviados via `fetch` para a API do backend publicado no Render.
+3. O backend valida novamente os dados e usa o Nodemailer para enviar um email real.
+4. A mensagem chega direto na caixa de entrada, com "responder" já configurado
+   para o email do visitante.
 
-Passos gerais (Render como exemplo):
-1. Suba a pasta `backend/` para um repositório no GitHub (pode ser um repositório separado do portfólio)
-2. Crie uma conta no Render e clique em "New Web Service"
-3. Conecte o repositório
-4. Configure o comando de start: `npm start`
-5. Em "Environment Variables", adicione `EMAIL_USER` e `EMAIL_PASS` (os mesmos valores do seu `.env`)
-6. Depois do deploy, copie a URL pública (algo como `https://seu-backend.onrender.com`)
-7. No `js/script.js` do portfólio, troque a constante `URL_BACKEND` de `http://localhost:3000/api/contato` para `https://seu-backend.onrender.com/api/contato`
+> Detalhes de configuração e deploy do backend estão em `backend/README.md`.

@@ -3,7 +3,7 @@
 Portfólio pessoal construído do zero com HTML, CSS e JavaScript puro (sem frameworks),
 como projeto de aprendizado de front-end, passo a passo.
 
-🔗 **Site publicado:** https://SEU_USUARIO.github.io/portfolio/
+🔗 **Site publicado:**  https://alexdenico96-tech.github.io/Meu-Portfolio/
 
 ## 🚧 Status
 Concluído — estrutura base pronta para receber conteúdo real (textos, projetos, links).
