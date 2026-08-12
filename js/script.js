@@ -122,7 +122,7 @@ const formContato = document.getElementById('formContato');
 
 // Endereço do backend. Em desenvolvimento local aponta pro localhost;
 // depois de publicar o backend (Render, Railway, etc), troque pela URL pública.
-const URL_BACKEND = 'https://meu-portfolio-6dcj.onrender.com';
+const URL_BACKEND = 'https://meu-portfolio-6dcj.onrender.com/api/contato';
 
 formContato.addEventListener('submit', async (evento) => {
   evento.preventDefault();
