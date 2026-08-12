@@ -1,76 +1,97 @@
-# Meu Portfólio
+# Backend do Portfólio
 
-Portfólio pessoal construído do zero com HTML, CSS e JavaScript puro no front-end
-(sem frameworks) e um pequeno backend em Node.js para envio de email — projeto de
-aprendizado de desenvolvimento full-stack, construído passo a passo.
+Servidor pequeno em Node.js + Express responsável por receber os dados do
+formulário de contato e enviar um email real usando Nodemailer.
 
-🔗 **Site publicado:** https://SEU_USUARIO.github.io/portfolio/
-🔗 **Backend (API de contato):** https://meu-portfolio-6dcj.onrender.com
+🔗 **Publicado em:** https://meu-portfolio-6dcj.onrender.com
 
-## 🚧 Status
-Concluído e publicado — front-end no GitHub Pages, backend no Render.
+## Como rodar localmente
 
-## 🛠️ Tecnologias
+1. Entre na pasta e instale as dependências:
+   ```bash
+   cd backend
+   npm install
+   ```
 
-**Front-end**
-- HTML5 (tags semânticas)
-- CSS3 (Flexbox, Grid, Media Queries, variáveis CSS, dark mode)
-- JavaScript Vanilla (DOM, Intersection Observer, Fetch API, localStorage)
+2. Copie o arquivo de exemplo de variáveis de ambiente:
+   ```bash
+   cp .env.example .env
+   ```
 
-**Back-end**
-- Node.js + Express
-- Nodemailer (envio de email via SMTP do Gmail)
-- Deploy no Render
+3. Gere uma **senha de app** do Gmail (não é sua senha normal):
+   - Acesse https://myaccount.google.com/security
+   - Ative a "Verificação em duas etapas" (obrigatório para gerar senha de app)
+   - Vá em "Senhas de app", crie uma nova para "Email"
+   - Copie a senha gerada (16 caracteres) e cole no `.env`, no campo `EMAIL_PASS`
 
-## ✨ Funcionalidades
-- Layout responsivo (desktop, tablet e mobile)
-- Menu de navegação com botão hambúrguer no mobile
-- Rolagem suave entre seções
-- Modo claro/escuro com persistência da escolha do visitante (localStorage)
-- Seção de estatísticas com contador animado ao entrar na tela
-- Formulário de contato com validação (front e back-end) e envio real de email
-- Foto vetorizada no hero, mantendo a identidade visual do site
+4. Preencha o `.env` com os dados **da conta correta**:
+   ```
+   EMAIL_USER=seu-email-real@gmail.com
+   EMAIL_PASS=xxxxxxxxxxxxxxxx
+   PORT=3000
+   ```
 
-## 📋 map
-- [x] Estrutura inicial do projeto
-- [x] Estrutura HTML das seções
-- [x] Estilização e responsividade
-- [x] Menu responsivo
-- [x] Estatísticas animadas
-- [x] Formulário de contato
-- [x] Ícones de redes sociais
-- [x] Deploy no GitHub Pages
-- [x] Conteúdo real (formação e projetos)
-- [x] Foto vetorizada no hero
-- [x] Dark mode com persistência
-- [x] Backend próprio com envio real de email
-- [x] Deploy do backend no Render
-- [ ] Adicionar novos projetos conforme forem ficando prontos
+5. Rode o servidor:
+   ```bash
+   npm start
+   ```
+   Acesse `http://localhost:3000` — deve aparecer "Backend do portfólio está rodando."
 
-## 📁 Estrutura do projeto
+## Como publicar (deploy)
+
+O GitHub Pages não roda back-end, então esse servidor precisa ser hospedado
+separadamente. Usamos o **Render** (render.com), plano free.
+
+Passos gerais:
+1. No Render, "New +" → "Web Service", conecte o repositório do portfólio
+2. **Root Directory:** `backend` (assim o Render roda só essa subpasta)
+3. **Build Command:** `npm install`
+4. **Start Command:** `npm start`
+5. Em "Environment Variables", adicione `EMAIL_USER` e `EMAIL_PASS`
+6. Depois do deploy, copie a URL pública e atualize a constante `URL_BACKEND`
+   no `js/script.js` do portfólio (incluindo o caminho `/api/contato` no final)
+
+## ⚠️ Solução de problemas
+
+### "Missing credentials for PLAIN"
+O `dotenv` não encontrou o arquivo `.env`. Confirme que:
+- O arquivo se chama exatamente `.env` (não `.env.txt` — ative "Extensões de
+  nome de arquivo" no Explorer do Windows para verificar)
+- Ele está dentro da pasta `backend/`, não na raiz do projeto
+- Você rodou `npm start` de dentro da pasta `backend/`
+
+### "Connection timeout" / "ETIMEDOUT" ao enviar email
+Aconteceu no deploy do Render: a configuração padrão do Nodemailer
+(`service: 'gmail'`, que usa a porta 465) deu timeout tentando conectar no
+Gmail a partir do servidor do Render. A correção foi configurar a conexão
+explicitamente pela **porta 587** (STARTTLS) em vez da 465:
+
+```javascript
+const transporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false,
+  requireTLS: true,
+  auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
+  connectionTimeout: 15000,
+});
 ```
-portfolio/
-├── index.html
-├── css/
-│   └── style.css
-├── js/
-│   └── script.js
-├── assets/
-│   └── perfil-hero.png
-├── backend/
-│   ├── server.js
-│   ├── package.json
-│   ├── .env.example
-│   ├── .gitignore
-│   └── README.md          (setup e deploy do backend)
-└── README.md               (este arquivo)
+
+Se o timeout persistir mesmo na porta 587, o próximo passo seria trocar o
+envio direto por SMTP por um serviço de email transacional (Resend, Brevo,
+etc.), que costuma ser mais confiável em hospedagens gratuitas.
+
+### Formulário publicado ainda aponta para "localhost"
+Sinal de que o `js/script.js` publicado no GitHub Pages está desatualizado.
+Confirme, na raiz do projeto:
+```bash
+git show HEAD:js/script.js | grep URL_BACKEND
 ```
+Se mostrar a URL antiga, o arquivo editado não foi commitado de fato — rode
+`git add js/script.js`, `git commit` e `git push` de novo, de dentro da pasta
+**raiz** do projeto (não de dentro de `backend/`).
 
-## 📬 Como o formulário de contato funciona
-1. O visitante preenche o formulário no site (validação instantânea em JavaScript).
-2. Os dados são enviados via `fetch` para a API do backend publicado no Render.
-3. O backend valida novamente os dados e usa o Nodemailer para enviar um email real.
-4. A mensagem chega direto na caixa de entrada, com "responder" já configurado
-   para o email do visitante.
-
-> Detalhes de configuração e deploy do backend estão em `backend/README.md`.
+### Primeira requisição demora ~50 segundos
+Normal no plano gratuito do Render: o servidor "dorme" após ~15 minutos sem
+uso e demora para "acordar" na primeira chamada. As requisições seguintes
+ficam rápidas.

@@ -31,7 +31,7 @@ Concluído e publicado — front-end no GitHub Pages, backend no Render.
 - Formulário de contato com validação (front e back-end) e envio real de email
 - Foto vetorizada no hero, mantendo a identidade visual do site
 
-## 📋 map
+## 📋 Roadmap
 - [x] Estrutura inicial do projeto
 - [x] Estrutura HTML das seções
 - [x] Estilização e responsividade

@@ -8,16 +8,18 @@
 }
 
 :root {
-  --cor-primaria: #7b2ff7;
-  --cor-secundaria: #a855f7;
-  --cor-gradiente: linear-gradient(135deg, #7b2ff7 0%, #a855f7 50%, #d946ef 100%);
+  --cor-primaria: #6d28d9;
+  --cor-secundaria: #3b82f6;
+  --cor-acento: #22d3ee;
+  --cor-gradiente: linear-gradient(135deg, #1e1b4b 0%, #6d28d9 45%, #2563eb 100%);
   --cor-texto: #1f1f2e;
   --cor-texto-claro: #6b6b80;
   --cor-fundo: #ffffff;
-  --cor-fundo-alt: #f7f6fb;
+  --cor-fundo-alt: #f5f5fb;
   --cor-header-fundo: rgba(255, 255, 255, 0.9);
   --cor-card-fundo: #ffffff;
-  --sombra: 0 10px 30px rgba(123, 47, 247, 0.15);
+  --sombra: 0 10px 30px rgba(109, 40, 217, 0.18);
+  --sombra-neon: 0 0 20px rgba(59, 130, 246, 0.5);
   --raio: 16px;
   --fonte: 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
@@ -27,11 +29,11 @@
 [data-theme="dark"] {
   --cor-texto: #f0f0f5;
   --cor-texto-claro: #b8b8c8;
-  --cor-fundo: #14141f;
-  --cor-fundo-alt: #1c1c2b;
-  --cor-header-fundo: rgba(20, 20, 31, 0.9);
-  --cor-card-fundo: #1f1f2e;
-  --sombra: 0 10px 30px rgba(0, 0, 0, 0.4);
+  --cor-fundo: #0d0d17;
+  --cor-fundo-alt: #15151f;
+  --cor-header-fundo: rgba(13, 13, 23, 0.9);
+  --cor-card-fundo: #191927;
+  --sombra: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 body {
@@ -76,7 +78,7 @@ body {
 .btn-primary {
   background: #fff;
   color: var(--cor-primaria);
-  box-shadow: var(--sombra);
+  box-shadow: var(--sombra), var(--sombra-neon);
 }
 
 .btn-secondary {
@@ -182,6 +184,28 @@ body {
   padding: 6rem 2rem 4rem;
   flex-wrap: wrap;
   text-align: left;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-onda {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  line-height: 0;
+  pointer-events: none;
+}
+
+.hero-onda svg {
+  width: 100%;
+  height: 70px;
+  display: block;
+}
+
+.hero-onda path {
+  fill: var(--cor-fundo);
+  transition: fill 0.3s ease;
 }
 
 .hero-content {
@@ -195,7 +219,8 @@ body {
 }
 
 .hero-content h1 span {
-  color: #ffe680;
+  color: var(--cor-acento);
+  text-shadow: 0 0 25px rgba(34, 211, 238, 0.6);
 }
 
 .hero-content p {
@@ -253,6 +278,72 @@ body {
 .section-text {
   color: var(--cor-texto-claro);
   font-size: 1.1rem;
+}
+
+/* ============================
+   FORMAÇÃO E EXPERIÊNCIA
+   ============================ */
+.formacao {
+  padding: 6rem 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.linha-tempo-grupo {
+  margin-bottom: 3rem;
+}
+
+.linha-tempo-titulo {
+  font-size: 1.3rem;
+  color: var(--cor-primaria);
+  margin-bottom: 1.5rem;
+}
+
+.linha-tempo {
+  position: relative;
+  padding-left: 2rem;
+  border-left: 2px solid rgba(109, 40, 217, 0.25);
+}
+
+.linha-tempo-item {
+  position: relative;
+  padding-bottom: 2rem;
+}
+
+.linha-tempo-item:last-child {
+  padding-bottom: 0;
+}
+
+/* bolinha marcando cada item na linha do tempo */
+.linha-tempo-item::before {
+  content: '';
+  position: absolute;
+  left: -2.4rem;
+  top: 0.3rem;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--cor-gradiente);
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.6);
+}
+
+.linha-tempo-data {
+  display: inline-block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--cor-secundaria);
+  margin-bottom: 0.3rem;
+}
+
+.linha-tempo-item h4 {
+  font-size: 1.1rem;
+  color: var(--cor-texto);
+  margin-bottom: 0.3rem;
+}
+
+.linha-tempo-item p {
+  color: var(--cor-texto-claro);
+  font-size: 0.95rem;
 }
 
 /* ============================
@@ -380,7 +471,7 @@ body {
    FOOTER
    ============================ */
 .footer {
-  background: #14141f;
+  background: #0d0d17;
   color: #fff;
   text-align: center;
   padding: 3rem 2rem;
