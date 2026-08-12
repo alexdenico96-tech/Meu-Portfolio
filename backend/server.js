@@ -121,7 +121,7 @@ numeros.forEach((numero) => observer.observe(numero));
 const formContato = document.getElementById('formContato');
 
 // Endereço do backend publicado no Render.
-const URL_BACKEND = 'https://meu-portfolio-6dcj.onrender.com/api/contato';
+const URL_BACKEND = 'https://meu-portfolio-6dcj.onrender.com';
 
 formContato.addEventListener('submit', async (evento) => {
   evento.preventDefault();
