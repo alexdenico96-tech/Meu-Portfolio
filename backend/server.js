@@ -1,187 +1,80 @@
 // ============================
-// MENU RESPONSIVO (HAMBÚRGUER)
+// BACKEND DO FORMULÁRIO DE CONTATO
 // ============================
+// Recebe os dados do formulário do portfólio e envia um email de verdade
+// usando o Nodemailer (biblioteca que fala com um servidor SMTP, no caso o do Gmail).
 
-// Pegamos os elementos do DOM pelo id que definimos no HTML
-const menuToggle = document.getElementById('menuToggle');
-const navLinks = document.getElementById('navLinks');
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const nodemailer = require('nodemailer');
 
-// Ao clicar no botão, alterna (toggle) a classe "ativo" no menu
-menuToggle.addEventListener('click', () => {
-  navLinks.classList.toggle('ativo');
-});
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-// Fecha o menu automaticamente ao clicar em um link
-// (útil no mobile: sem isso, o menu ficaria aberto após navegar)
-const links = navLinks.querySelectorAll('a');
-links.forEach((link) => {
-  link.addEventListener('click', () => {
-    navLinks.classList.remove('ativo');
-  });
-});
+// Permite que o navegador (rodando em outro domínio, ex: GitHub Pages)
+// consiga chamar essa API. Sem isso, o navegador bloqueia a requisição por segurança (CORS).
+app.use(cors());
+app.use(express.json());
 
-
-// ============================
-// DARK MODE (COM PERSISTÊNCIA)
-// ============================
-
-const themeToggle = document.getElementById('themeToggle');
-const themeIcon = themeToggle.querySelector('.theme-icon');
-const html = document.documentElement;
-
-// 1) Ao carregar a página, decide qual tema usar:
-//    prioridade: escolha salva pelo usuário > preferência do sistema operacional > claro
-function aplicarTemaInicial() {
-  const temaSalvo = localStorage.getItem('tema');
-
-  if (temaSalvo) {
-    definirTema(temaSalvo);
-    return;
-  }
-
-  const prefereSistemaEscuro = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  definirTema(prefereSistemaEscuro ? 'dark' : 'light');
-}
-
-// 2) Aplica o tema no HTML e atualiza o ícone do botão
-function definirTema(tema) {
-  if (tema === 'dark') {
-    html.setAttribute('data-theme', 'dark');
-    themeIcon.textContent = '☀️'; // mostra sol = "clique para clarear"
-  } else {
-    html.removeAttribute('data-theme');
-    themeIcon.textContent = '🌙'; // mostra lua = "clique para escurecer"
-  }
-}
-
-// 3) Ao clicar, alterna o tema e SALVA a escolha no navegador do visitante
-//    (localStorage persiste mesmo depois de fechar o navegador)
-themeToggle.addEventListener('click', () => {
-  const temaAtual = html.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
-  const novoTema = temaAtual === 'dark' ? 'light' : 'dark';
-  definirTema(novoTema);
-  localStorage.setItem('tema', novoTema);
-});
-
-aplicarTemaInicial();
-
-
-// ============================
-// ESTATÍSTICAS ANIMADAS (CONTADOR)
-// ============================
-
-// Pega todos os elementos com a classe .stat-numero (os 3 números da seção)
-const numeros = document.querySelectorAll('.stat-numero');
-
-// Função que anima um único número de 0 até o valor alvo
-function animarContador(elemento) {
-  const alvo = parseInt(elemento.dataset.alvo); // lê o atributo data-alvo="50" como número
-  const duracao = 1500; // duração total da animação, em milissegundos
-  const fps = 60; // quadros por segundo, pra animação ficar suave
-  const totalFrames = Math.round(duracao / (1000 / fps));
-  let frame = 0;
-
-  const intervalo = setInterval(() => {
-    frame++;
-    // progresso vai de 0 até 1 conforme os frames avançam
-    const progresso = frame / totalFrames;
-    const valorAtual = Math.round(alvo * progresso);
-    elemento.textContent = valorAtual;
-
-    if (frame === totalFrames) {
-      clearInterval(intervalo); // para o loop quando a animação termina
-      elemento.textContent = alvo; // garante que termine exatamente no valor certo
-    }
-  }, 1000 / fps);
-}
-
-// Cria o "observador": ele vai vigiar quando os elementos entram na tela
-const observer = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      // entry.isIntersecting é true quando o elemento está visível na tela
-      if (entry.isIntersecting) {
-        animarContador(entry.target);
-        // para de observar depois de animar uma vez (evita repetir o efeito)
-        observer.unobserve(entry.target);
-      }
-    });
+// "Transporter" é o objeto do Nodemailer responsável por conectar no servidor
+// de email e efetivamente enviar a mensagem. As credenciais vêm de variáveis
+// de ambiente (.env) — NUNCA colocamos senha direto no código.
+const transporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false, // false para porta 587 (usa STARTTLS); true seria só para porta 465
+  requireTLS: true,
+  auth: {
+    user: process.env.EMAIL_USER, // seu email (alexdenico@gmail.com)
+    pass: process.env.EMAIL_PASS, // "senha de app" do Gmail (não é sua senha normal, explico abaixo)
   },
-  { threshold: 0.5 } // dispara quando 50% do elemento estiver visível
-);
+  connectionTimeout: 15000, // 15s pra tentar conectar antes de desistir
+});
 
-// Manda o observador vigiar cada número da seção de estatísticas
-numeros.forEach((numero) => observer.observe(numero));
+// Expressão regular simples para validar formato de email
+const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+app.post('/api/contato', async (req, res) => {
+  const { nome, email, mensagem } = req.body;
 
-// ============================
-// FORMULÁRIO DE CONTATO
-// ============================
-
-const formContato = document.getElementById('formContato');
-
-// Endereço do backend publicado no Render.
-const URL_BACKEND = 'https://meu-portfolio-6dcj.onrender.com/api/contato';
-
-formContato.addEventListener('submit', async (evento) => {
-  evento.preventDefault();
-
-  const nome = formContato.nome.value.trim();
-  const email = formContato.email.value.trim();
-  const mensagem = formContato.mensagem.value.trim();
-  const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-  if (nome === '' || email === '' || mensagem === '') {
-    mostrarFeedback('Por favor, preencha todos os campos.', 'erro');
-    return;
+  // Validação no back-end: NUNCA confie só na validação do navegador,
+  // qualquer pessoa pode chamar essa API diretamente sem passar pelo seu HTML.
+  if (!nome || !email || !mensagem) {
+    return res.status(400).json({ erro: 'Preencha todos os campos.' });
   }
 
   if (!regexEmail.test(email)) {
-    mostrarFeedback('Digite um email válido.', 'erro');
-    return;
+    return res.status(400).json({ erro: 'Email inválido.' });
   }
 
-  const botaoEnviar = formContato.querySelector('button[type="submit"]');
-  const textoOriginalBotao = botaoEnviar.textContent;
-  botaoEnviar.textContent = 'Enviando...';
-  botaoEnviar.disabled = true;
-
   try {
-    const resposta = await fetch(URL_BACKEND, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nome, email, mensagem }),
+    await transporter.sendMail({
+      from: `"Portfólio - ${nome}" <${process.env.EMAIL_USER}>`,
+      to: process.env.EMAIL_USER, // chega na sua caixa de entrada
+      replyTo: email, // se você clicar "Responder", vai direto pro visitante
+      subject: `Nova mensagem de ${nome} pelo portfólio`,
+      text: mensagem,
+      html: `
+        <h3>Nova mensagem pelo formulário do portfólio</h3>
+        <p><strong>Nome:</strong> ${nome}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Mensagem:</strong></p>
+        <p>${mensagem.replace(/\n/g, '<br>')}</p>
+      `,
     });
 
-    const dados = await resposta.json();
-
-    if (!resposta.ok) {
-      throw new Error(dados.erro || 'Erro ao enviar mensagem.');
-    }
-
-    mostrarFeedback(`Obrigado, ${nome}! Sua mensagem foi enviada com sucesso.`, 'sucesso');
-    formContato.reset();
+    res.status(200).json({ sucesso: true });
   } catch (erro) {
-    mostrarFeedback('Não foi possível enviar agora. Tente novamente em instantes.', 'erro');
-    console.error(erro);
-  } finally {
-    botaoEnviar.textContent = textoOriginalBotao;
-    botaoEnviar.disabled = false;
+    console.error('Erro ao enviar email:', erro);
+    res.status(500).json({ erro: 'Não foi possível enviar a mensagem. Tente novamente mais tarde.' });
   }
 });
 
-// Cria (ou reutiliza) um elemento de texto abaixo do formulário para mostrar o feedback
-function mostrarFeedback(texto, tipo) {
-  let feedback = document.getElementById('formFeedback');
+app.get('/', (req, res) => {
+  res.send('Backend do portfólio está rodando.');
+});
 
-  if (!feedback) {
-    feedback = document.createElement('p');
-    feedback.id = 'formFeedback';
-    formContato.appendChild(feedback);
-  }
-
-  feedback.textContent = texto;
-  feedback.style.color = tipo === 'erro' ? '#e63946' : '#2a9d8f';
-  feedback.style.marginTop = '0.5rem';
-  feedback.style.fontWeight = '600';
-}
+app.listen(PORT, () => {
+  console.log(`Servidor rodando em http://localhost:${PORT}`);
+});
