@@ -4,11 +4,11 @@ Portfólio pessoal construído do zero com HTML, CSS e JavaScript puro no front-
 (sem frameworks) e um pequeno backend em Node.js para envio de email — projeto de
 aprendizado de desenvolvimento full-stack, construído passo a passo.
 
-🔗 **Site publicado:** https://alexdenico96-tech.github.io/Meu-Portfolio/
+🔗 **Site publicado:** https://SEU_USUARIO.github.io/portfolio/
 🔗 **Backend (API de contato):** https://meu-portfolio-6dcj.onrender.com
 
 ## 🚧 Status
-Concluído e publicado — front-end no GitHub Pages, backend no Render.
+Concluído e publicado — front-end no GitHub Pages, backend no Render, formulário de contato enviando emails reais via Resend.
 
 ## 🛠️ Tecnologias
 
@@ -45,6 +45,9 @@ Concluído e publicado — front-end no GitHub Pages, backend no Render.
 - [x] Dark mode com persistência
 - [x] Backend próprio com envio real de email
 - [x] Deploy do backend no Render
+- [x] Seção de Formação e Experiência
+- [x] Corrigir timeout no envio de email (migrado de SMTP para Resend)
+- [ ] Preencher Formação e Experiência com conteúdo real
 - [ ] Adicionar novos projetos conforme forem ficando prontos
 
 ## 📁 Estrutura do projeto
@@ -69,7 +72,9 @@ portfolio/
 ## 📬 Como o formulário de contato funciona
 1. O visitante preenche o formulário no site (validação instantânea em JavaScript).
 2. Os dados são enviados via `fetch` para a API do backend publicado no Render.
-3. O backend valida novamente os dados e usa o Nodemailer para enviar um email real.
+3. O backend valida novamente os dados e usa o **Resend** (API de email via HTTPS)
+   para enviar um email real — trocamos do SMTP direto (Nodemailer + Gmail) porque
+   o Render bloqueia conexões SMTP de saída no plano gratuito, causando timeout.
 4. A mensagem chega direto na caixa de entrada, com "responder" já configurado
    para o email do visitante.
 

@@ -1,7 +1,7 @@
 # Backend do Portfólio
 
 Servidor pequeno em Node.js + Express responsável por receber os dados do
-formulário de contato e enviar um email real usando Nodemailer.
+formulário de contato e enviar um email real usando a API do **Resend**.
 
 🔗 **Publicado em:** https://meu-portfolio-6dcj.onrender.com
 
@@ -18,16 +18,14 @@ formulário de contato e enviar um email real usando Nodemailer.
    cp .env.example .env
    ```
 
-3. Gere uma **senha de app** do Gmail (não é sua senha normal):
-   - Acesse https://myaccount.google.com/security
-   - Ative a "Verificação em duas etapas" (obrigatório para gerar senha de app)
-   - Vá em "Senhas de app", crie uma nova para "Email"
-   - Copie a senha gerada (16 caracteres) e cole no `.env`, no campo `EMAIL_PASS`
+3. Crie uma conta gratuita em [resend.com](https://resend.com) (dá pra entrar
+   direto com o Google) e gere uma chave de API em "API Keys" → "Create API Key".
+   Copie a chave (ela só aparece uma vez) e cole no `.env`, no campo `RESEND_API_KEY`.
 
-4. Preencha o `.env` com os dados **da conta correta**:
+4. Preencha o `.env`:
    ```
    EMAIL_USER=seu-email-real@gmail.com
-   EMAIL_PASS=xxxxxxxxxxxxxxxx
+   RESEND_API_KEY=re_xxxxxxxxxxxxxxxx
    PORT=3000
    ```
 
@@ -36,6 +34,10 @@ formulário de contato e enviar um email real usando Nodemailer.
    npm start
    ```
    Acesse `http://localhost:3000` — deve aparecer "Backend do portfólio está rodando."
+
+> Não precisa verificar domínio próprio no Resend: como o email é sempre
+> enviado **para a sua própria caixa** (`EMAIL_USER`), o remetente de teste
+> padrão do Resend (`onboarding@resend.dev`) já funciona sem configuração extra.
 
 ## Como publicar (deploy)
 
@@ -47,39 +49,30 @@ Passos gerais:
 2. **Root Directory:** `backend` (assim o Render roda só essa subpasta)
 3. **Build Command:** `npm install`
 4. **Start Command:** `npm start`
-5. Em "Environment Variables", adicione `EMAIL_USER` e `EMAIL_PASS`
+5. Em "Environment Variables", adicione `EMAIL_USER` e `RESEND_API_KEY`
 6. Depois do deploy, copie a URL pública e atualize a constante `URL_BACKEND`
    no `js/script.js` do portfólio (incluindo o caminho `/api/contato` no final)
 
 ## ⚠️ Solução de problemas
 
-### "Missing credentials for PLAIN"
-O `dotenv` não encontrou o arquivo `.env`. Confirme que:
-- O arquivo se chama exatamente `.env` (não `.env.txt` — ative "Extensões de
-  nome de arquivo" no Explorer do Windows para verificar)
-- Ele está dentro da pasta `backend/`, não na raiz do projeto
-- Você rodou `npm start` de dentro da pasta `backend/`
+### "Missing credentials for PLAIN" (histórico, já resolvido)
+Acontecia quando o `dotenv` não encontrava o `.env`. Confirme que o arquivo
+se chama exatamente `.env` (não `.env.txt`) e está dentro de `backend/`.
 
-### "Connection timeout" / "ETIMEDOUT" ao enviar email
-Aconteceu no deploy do Render: a configuração padrão do Nodemailer
-(`service: 'gmail'`, que usa a porta 465) deu timeout tentando conectar no
-Gmail a partir do servidor do Render. A correção foi configurar a conexão
-explicitamente pela **porta 587** (STARTTLS) em vez da 465:
+### "Connection timeout" / "ETIMEDOUT" ao enviar email (histórico, já resolvido)
+**Causa raiz encontrada:** o Render, no plano gratuito, bloqueia conexões
+SMTP de saída — por isso o Nodemailer (conectando direto no `smtp.gmail.com`,
+tanto na porta 465 quanto na 587) sempre dava timeout, mesmo com credenciais
+corretas.
 
-```javascript
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
-  secure: false,
-  requireTLS: true,
-  auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
-  connectionTimeout: 15000,
-});
-```
+**Solução:** trocamos o envio por SMTP direto pela **API do Resend**, que
+funciona por uma chamada HTTPS comum (nunca bloqueada), em vez de abrir uma
+conexão de rede na porta de email.
 
-Se o timeout persistir mesmo na porta 587, o próximo passo seria trocar o
-envio direto por SMTP por um serviço de email transacional (Resend, Brevo,
-etc.), que costuma ser mais confiável em hospedagens gratuitas.
+### Push feito mas o Render continua rodando código antigo
+Às vezes o Auto-Deploy do Render não dispara sozinho depois de um push.
+Solução: no painel do serviço, "Manual Deploy" → "Deploy latest commit"
+para forçar a atualização.
 
 ### Formulário publicado ainda aponta para "localhost"
 Sinal de que o `js/script.js` publicado no GitHub Pages está desatualizado.
