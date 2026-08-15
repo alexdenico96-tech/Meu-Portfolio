@@ -1,13 +1,18 @@
 // ============================
 // BACKEND DO FORMULÁRIO DE CONTATO
 // ============================
-// Recebe os dados do formulário do portfólio e envia um email de verdade
-// usando o Nodemailer (biblioteca que fala com um servidor SMTP, no caso o do Gmail).
+// Recebe os dados do formulário do portfólio e envia um email de verdade.
+//
+// IMPORTANTE: usamos o Resend (API de email via HTTPS) em vez de conectar
+// direto num servidor SMTP (como o Gmail). Isso porque o Render, no plano
+// gratuito, bloqueia conexões SMTP de saída — então o Nodemailer sempre
+// dava timeout, mesmo com as credenciais certas. A API do Resend funciona
+// por uma chamada HTTPS normal, que nunca é bloqueada.
 
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -17,20 +22,8 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// "Transporter" é o objeto do Nodemailer responsável por conectar no servidor
-// de email e efetivamente enviar a mensagem. As credenciais vêm de variáveis
-// de ambiente (.env) — NUNCA colocamos senha direto no código.
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
-  secure: false, // false para porta 587 (usa STARTTLS); true seria só para porta 465
-  requireTLS: true,
-  auth: {
-    user: process.env.EMAIL_USER, // seu email (alexdenico@gmail.com)
-    pass: process.env.EMAIL_PASS, // "senha de app" do Gmail (não é sua senha normal, explico abaixo)
-  },
-  connectionTimeout: 15000, // 15s pra tentar conectar antes de desistir
-});
+// Cliente do Resend, autenticado com a chave de API (guardada no .env, nunca no código)
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Expressão regular simples para validar formato de email
 const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -49,12 +42,13 @@ app.post('/api/contato', async (req, res) => {
   }
 
   try {
-    await transporter.sendMail({
-      from: `"Portfólio - ${nome}" <${process.env.EMAIL_USER}>`,
+    const resultado = await resend.emails.send({
+      // "onboarding@resend.dev" é um remetente de teste que o Resend libera
+      // sem precisar verificar domínio próprio — funciona por padrão.
+      from: 'Portfólio <onboarding@resend.dev>',
       to: process.env.EMAIL_USER, // chega na sua caixa de entrada
-      replyTo: email, // se você clicar "Responder", vai direto pro visitante
+      reply_to: email, // se você clicar "Responder", vai direto pro visitante
       subject: `Nova mensagem de ${nome} pelo portfólio`,
-      text: mensagem,
       html: `
         <h3>Nova mensagem pelo formulário do portfólio</h3>
         <p><strong>Nome:</strong> ${nome}</p>
@@ -63,6 +57,10 @@ app.post('/api/contato', async (req, res) => {
         <p>${mensagem.replace(/\n/g, '<br>')}</p>
       `,
     });
+
+    if (resultado.error) {
+      throw new Error(resultado.error.message);
+    }
 
     res.status(200).json({ sucesso: true });
   } catch (erro) {
