@@ -4,7 +4,7 @@ Portfólio pessoal construído do zero com HTML, CSS e JavaScript puro no front-
 (sem frameworks) e um pequeno backend em Node.js para envio de email — projeto de
 aprendizado de desenvolvimento full-stack, construído passo a passo.
 
-🔗 **Site publicado:** https://SEU_USUARIO.github.io/portfolio/
+🔗 **Site publicado:** https://alexdenico96-tech.github.io/Meu-Portfolio/
 🔗 **Backend (API de contato):** https://meu-portfolio-6dcj.onrender.com
 
 ## 🚧 Status
@@ -47,7 +47,7 @@ Concluído e publicado — front-end no GitHub Pages, backend no Render, formul�
 - [x] Deploy do backend no Render
 - [x] Seção de Formação e Experiência
 - [x] Corrigir timeout no envio de email (migrado de SMTP para Resend)
-- [ ] Preencher Formação e Experiência com conteúdo real
+- [x] Preencher Formação e Experiência com conteúdo real
 - [ ] Adicionar novos projetos conforme forem ficando prontos
 
 ## 📁 Estrutura do projeto
