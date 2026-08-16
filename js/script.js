@@ -158,10 +158,11 @@ formContato.addEventListener('submit', async (evento) => {
 
   const nome = formContato.nome.value.trim();
   const email = formContato.email.value.trim();
+  const assunto = formContato.assunto.value.trim();
   const mensagem = formContato.mensagem.value.trim();
   const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  if (nome === '' || email === '' || mensagem === '') {
+  if (nome === '' || email === '' || assunto === '' || mensagem === '') {
     mostrarFeedback('Por favor, preencha todos os campos.', 'erro');
     return;
   }
@@ -180,7 +181,7 @@ formContato.addEventListener('submit', async (evento) => {
     const resposta = await fetch(URL_BACKEND, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nome, email, mensagem }),
+      body: JSON.stringify({ nome, email, assunto, mensagem }),
     });
 
     const dados = await resposta.json();

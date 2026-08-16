@@ -29,11 +29,11 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 app.post('/api/contato', async (req, res) => {
-  const { nome, email, mensagem } = req.body;
+  const { nome, email, assunto, mensagem } = req.body;
 
   // Validação no back-end: NUNCA confie só na validação do navegador,
   // qualquer pessoa pode chamar essa API diretamente sem passar pelo seu HTML.
-  if (!nome || !email || !mensagem) {
+  if (!nome || !email || !assunto || !mensagem) {
     return res.status(400).json({ erro: 'Preencha todos os campos.' });
   }
 
@@ -48,11 +48,12 @@ app.post('/api/contato', async (req, res) => {
       from: 'Portfólio <onboarding@resend.dev>',
       to: process.env.EMAIL_USER, // chega na sua caixa de entrada
       reply_to: email, // se você clicar "Responder", vai direto pro visitante
-      subject: `Nova mensagem de ${nome} pelo portfólio`,
+      subject: `[Portfólio] ${assunto} — ${nome}`,
       html: `
         <h3>Nova mensagem pelo formulário do portfólio</h3>
         <p><strong>Nome:</strong> ${nome}</p>
         <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Assunto:</strong> ${assunto}</p>
         <p><strong>Mensagem:</strong></p>
         <p>${mensagem.replace(/\n/g, '<br>')}</p>
       `,
