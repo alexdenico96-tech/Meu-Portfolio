@@ -81,7 +81,13 @@ function alternarConnor() {
   // Só carrega o iframe na PRIMEIRA vez que o painel abre — assim a página
   // do portfólio não gasta recursos carregando o chat se ninguém for usá-lo,
   // e não "acorda" o backend gratuito do Render sem necessidade.
-  if (estaAberto && !connorIframe.src) {
+  //
+  // IMPORTANTE: usamos getAttribute('src') em vez de connorIframe.src aqui.
+  // Isso porque a PROPRIEDADE .src de um iframe com src="" vazio no HTML
+  // retorna a URL da própria página atual (não uma string vazia!), então
+  // "!connorIframe.src" nunca seria verdadeiro. O ATRIBUTO, checado com
+  // getAttribute, reflete exatamente o que está escrito no HTML.
+  if (estaAberto && !connorIframe.getAttribute('src')) {
     connorIframe.src = connorIframe.dataset.src;
   }
 }
