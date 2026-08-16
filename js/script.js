@@ -67,6 +67,30 @@ aplicarTemaInicial();
 
 
 // ============================
+// WIDGET FLUTUANTE DO CONNOR
+// ============================
+
+const connorBotao = document.getElementById('connorBotao');
+const connorPainel = document.getElementById('connorPainel');
+const connorFechar = document.getElementById('connorFechar');
+const connorIframe = document.getElementById('connorIframe');
+
+function alternarConnor() {
+  const estaAberto = connorPainel.classList.toggle('aberto');
+
+  // Só carrega o iframe na PRIMEIRA vez que o painel abre — assim a página
+  // do portfólio não gasta recursos carregando o chat se ninguém for usá-lo,
+  // e não "acorda" o backend gratuito do Render sem necessidade.
+  if (estaAberto && !connorIframe.src) {
+    connorIframe.src = connorIframe.dataset.src;
+  }
+}
+
+connorBotao.addEventListener('click', alternarConnor);
+connorFechar.addEventListener('click', alternarConnor);
+
+
+// ============================
 // ESTATÍSTICAS ANIMADAS (CONTADOR)
 // ============================
 
@@ -120,8 +144,7 @@ numeros.forEach((numero) => observer.observe(numero));
 
 const formContato = document.getElementById('formContato');
 
-// Endereço do backend. Em desenvolvimento local aponta pro localhost;
-// depois de publicar o backend (Render, Railway, etc), troque pela URL pública.
+// Endereço do backend publicado no Render.
 const URL_BACKEND = 'https://meu-portfolio-6dcj.onrender.com/api/contato';
 
 formContato.addEventListener('submit', async (evento) => {
