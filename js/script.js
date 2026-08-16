@@ -145,6 +145,29 @@ numeros.forEach((numero) => observer.observe(numero));
 
 
 // ============================
+// REVELAR AO ROLAR (SCROLL REVEAL)
+// ============================
+
+// Pega todo elemento marcado com a classe .reveal (deslizar esquerda/direita)
+const elementosRevelar = document.querySelectorAll('.reveal');
+
+const observerRevelar = new IntersectionObserver(
+  (entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visivel');
+        // para de observar depois de revelar uma vez — não repete ao rolar pra cima e descer de novo
+        observerRevelar.unobserve(entry.target);
+      }
+    });
+  },
+  { threshold: 0.15 } // dispara quando 15% do elemento já está visível
+);
+
+elementosRevelar.forEach((elemento) => observerRevelar.observe(elemento));
+
+
+// ============================
 // FORMULÁRIO DE CONTATO
 // ============================
 
